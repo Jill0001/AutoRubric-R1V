@@ -6,16 +6,12 @@
 set -x
 # Configuration
 ENGINE=${1:-vllm}
-export WANDB_API_KEY=45d3ceb6a15fed92a1ca9fd03f5d5833b77b5c9f
-SAVE_DIR=/mnt/s3/training_saves_aftsub
-# PROJECT_NAME=verl_grpo_7b_aftsub
-PROJECT_NAME=debug
-
-DATA_PATH=/mnt/s3/datasets/verl_training_datasets/ViRL39K/train_w_rubrics.parquet
-# DATA_PATH=$DATA_DIR/geometry3k_new/train_w_rubrics.parquet
-# VAR_DATA=$DATA_DIR/val6dataset/validation_data.parquet
-VAR_DATA_PATH=$DATA_PATH
-EXPERIMENT_NAME=debug
+export WANDB_API_KEY="YOUR_WANDB_API_KEY"
+DATA_PATH="YOUR_DATA_PATH"
+VAR_DATA_PATH="YOUR_VAR_PATH"
+PROJECT_NAME="YOUR_PROJECT_NAME"
+EXPERIMENT_NAME="YOUR_EXPERIMENT_NAME"
+SAVE_DIR="YOUR_SAVE_PATH"
 LOCAL_SAVE_PATH=$SAVE_DIR/$PROJECT_NAME/$EXPERIMENT_NAME
 
 MODEL_PATH="Qwen/Qwen2.5-VL-7B-Instruct"
@@ -83,8 +79,8 @@ python3 -m verl.trainer.main_ppo \
     algorithm.adv_estimator=grpo \
     data.train_files=$DATA_PATH \
     data.val_files=$VAR_DATA_PATH \
-    data.train_batch_size=8 \
-    data.max_prompt_length=5000 \
+    data.train_batch_size=512 \
+    data.max_prompt_length=5200 \
     data.max_response_length=1024 \
     data.filter_overlong_prompts=True \
     data.truncation='error' \
@@ -92,7 +88,7 @@ python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.model.path=$MODEL_PATH \
     actor_rollout_ref.actor.optim.lr=1e-6 \
     actor_rollout_ref.model.use_remove_padding=True \
-    actor_rollout_ref.actor.ppo_mini_batch_size=8 \
+    actor_rollout_ref.actor.ppo_mini_batch_size=128 \
     actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu=4 \
     actor_rollout_ref.actor.use_kl_loss=True \
     actor_rollout_ref.actor.kl_loss_coef=0.01 \
@@ -130,8 +126,8 @@ python3 -m verl.trainer.main_ppo \
     trainer.n_gpus_per_node=4 \
     trainer.val_before_train=False \
     trainer.nnodes=1 \
-    trainer.save_freq=10 \
-    trainer.test_freq=10000 \
-    trainer.total_epochs=30 $@
+    trainer.save_freq=30 \
+    trainer.test_freq=30 \
+    trainer.total_epochs=4 $@
 
 echo "Training completed!"

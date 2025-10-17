@@ -9,7 +9,9 @@ from utils_eval import symbols, option_refine
 open_hint = "Hint: Please answer the question and provide the final answer, e.g., 1.23, 1.34, 1.45, at the end.\n"
 mc_hint = "Hint: Please answer the question and provide the correct option letter, e.g., A, B, C, D, at the end.\n"
 
-eval_data_root = "/mnt/s3/eval_datasets/"
+eval_data_root = (
+    "YOUR_EVAL_DATA_ROOT_PATH/"  # Please set your evaluation data root path here
+)
 
 
 def load_data_mathvision(root_dir=eval_data_root + "mathvision"):
@@ -32,6 +34,8 @@ def load_data_mathvision(root_dir=eval_data_root + "mathvision"):
     for sample in samples:
         sample["pid"] = sample["id"]
         sample["image"] = os.path.join(root_dir, sample["image"])
+        if not os.path.exists(sample["image"]):
+            os.sys("cd {root_dir} && unzip -q images.zip")
         question = sample["question"]
         for _ in to_be_removed:
             question = question.replace(_, "")
@@ -55,6 +59,8 @@ def load_data_mathvista(root_dir=eval_data_root + "mathvista"):
         os.path.join(root_dir, "testmini-00000-of-00001-725687bf7a18d64b.parquet")
     )
     image_root = os.path.join(root_dir, "images")
+    if not os.path.exists(image_root):
+        os.sys(f"cd {root_dir} && unzip -q images.zip")
     new_samples = []
     for sample in samples:
         new_sample = {}
@@ -85,6 +91,8 @@ def load_data_mathverse(root_dir=eval_data_root + "mathverse"):
     for sample in samples:
         sample["pid"] = sample["sample_index"]
         sample["image"] = os.path.join(image_root, sample["image"])
+        if not os.path.exists(sample["image"]):
+            os.sys(f"cd {root_dir} && unzip -q images.zip")
         sample["query"] = sample["query_cot"]
         sample["gt"] = sample["answer"]
         if sample["question_type"] == "multi-choice":
